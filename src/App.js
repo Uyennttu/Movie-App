@@ -1,25 +1,39 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect, useState } from 'react';
+import "bootstrap/dist/css/bootstrap.min.css";
+import "./App.css";
+import MovieList from './components/MovieList';
+import MovieListHeading from './components/MovieListHeading';
+import SearchBox from './components/SearchBox';
+import AddFavorite from './components/AddFavorites';
 
-function App() {
+
+const App = () => {
+  const [movies, setMovies] = useState([]);
+  const[favorites, setFavorites] =  useState([]);
+  const [searchValue, setSearchValue] = useState('');
+  const getMovieRequest = async () => {
+    const url = `https://www.omdbapi.com/?apikey=2972cec5&s=${searchValue}`
+    const response = await fetch(url);
+    const responseJson = await response.json();
+    if (responseJson.Search) {
+      setMovies(responseJson.Search);
+    }
+
+  };
+  useEffect(() => {
+    getMovieRequest(searchValue);
+  }, [searchValue]);
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className='container'>
+      <div className='d-flex align-items-center mt-4 mb-4'>
+        <MovieListHeading heading='Movies' />
+        <SearchBox searchValue={searchValue} setSearchValue={setSearchValue} />
+      </div>
+      <div className='row'>
+        <MovieList movies={movies} favoriteComponent={AddFavorite}/>
+      </div>
     </div>
   );
-}
+};
 
 export default App;
