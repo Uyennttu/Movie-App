@@ -1,39 +1,77 @@
 import React, { useEffect, useState } from 'react';
-import "bootstrap/dist/css/bootstrap.min.css";
+import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+//import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
+import Header from './components/Header';
 import MovieList from './components/MovieList';
-import MovieListHeading from './components/MovieListHeading';
-import SearchBox from './components/SearchBox';
-import AddFavorite from './components/AddFavorites';
+import Watched from './components/Watched';
+import AddFavorites from './components/AddFavorites';
 
+const SEARCH_API = "https://api.themoviedb.org/3/search/movie?&api_key=6b231d8f308a609fa822c5cd10b33b7a";
+const FEATURED_API = "https://api.themoviedb.org/3/discover/movie?sort_by=popularity.desc&api_key=6b231d8f308a609fa822c5cd10b33b7a";
 
-const App = () => {
+function App() {
   const [movies, setMovies] = useState([]);
-  const[favorites, setFavorites] =  useState([]);
   const [searchValue, setSearchValue] = useState('');
-  const getMovieRequest = async () => {
-    const url = `https://www.omdbapi.com/?apikey=2972cec5&s=${searchValue}`
-    const response = await fetch(url);
-    const responseJson = await response.json();
-    if (responseJson.Search) {
-      setMovies(responseJson.Search);
-    }
+  const [favorites, setFavorites] = useState([]);
 
+  const getMovies = (API) => {
+    fetch(API)
+      .then((res) => res.json())
+      .then((data) => {
+        setMovies(data.results);
+      });
   };
+
   useEffect(() => {
-    getMovieRequest(searchValue);
-  }, [searchValue]);
+    getMovies(FEATURED_API)
+  }, []);
+
+  //SEARCH MOVIE
+  const handleOnSubmit = (e) => {
+    e.preventDefault();
+    if (searchValue.trim()) {
+      getMovies(`${SEARCH_API}&query=${searchValue}`);
+    } setSearchValue('');
+  };
+
+  const handleOnChange = (e) => {
+    setSearchValue(e.target.value);
+  };
+
+  const addFavorites = (movie) => {
+    const newFavoriteList = [...favorites, movie];
+    setFavorites(newFavoriteList);
+  }
+
   return (
-    <div className='container'>
-      <div className='d-flex align-items-center mt-4 mb-4'>
-        <MovieListHeading heading='Movies' />
-        <SearchBox searchValue={searchValue} setSearchValue={setSearchValue} />
-      </div>
-      <div className='row'>
-        <MovieList movies={movies} favoriteComponent={AddFavorite}/>
-      </div>
-    </div>
+    //react fragment??
+    <>
+
+      <header>
+        <div className='heading'>
+          <h1>Movies</h1>
+        </div>
+
+
+        <form onSubmit={handleOnSubmit}>
+          <input className='search' type='search' placeholder='Search...'
+            value={searchValue}
+            onChange={handleOnChange}
+          />
+        </form>
+      </header>
+
+     
+          <div className='movie-container'>
+            <MovieList movies={movies}
+              handleFavoritesClick={addFavorites}
+              favoriteComponent={AddFavorites} />
+          </div>
+       
+    </>
+    
   );
-};
+}
 
 export default App;
