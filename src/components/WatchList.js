@@ -2,30 +2,32 @@ import React, { useContext } from 'react';
 import { GlobalContext } from '../context/GlobalState';
 import MovieCard from './MovieCard';
 
-const Watched = () => {
-  const { watched } = useContext(GlobalContext);
+const WatchList = () => {
+  const { watchlist } = useContext(GlobalContext);
+
   return (
     <div className='movie-page'>
       <div className='watchlist-container'>
         <div className='header'>
-          <h2>Watched List</h2>
+          <h2>My Watchlist</h2>
         </div>
 
-        {watched.length > 0 ? (
+        {watchlist.length > 0 ? (
           <div className='movie-container'>
-            {watched.map((movie) => (
-              <MovieCard movie={movie} type='watched' />
+            {watchlist.map((movie) => (
+              <MovieCard movie={movie} type='watchlist' />
             ))}
           </div>
         ) : (
-          <h2 className='no-movies'>No Movies in Your List, Add Some!</h2>
+          <h2 className='no-movies'>You Have No Movies To Watch.</h2>
         )}
       </div>
     </div>
   );
 };
 
-export default Watched;
+export default WatchList;
+
 
 
 
